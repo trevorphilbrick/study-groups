@@ -82,7 +82,7 @@ const LoginScreen = () => {
         onChange={(e) => setPassword(e.nativeEvent.text)}
       />
       <View style={{ flexDirection: "row", justifyContent: "center" }}>
-        <Text style={{ marginBottom: 24 }}>Don't have an account? </Text>
+        <Text style={{ marginBottom: 24 }}>Don&apos;t have an account? </Text>
         <Pressable onPress={() => navigation.navigate("Register")}>
           <Text style={{ fontWeight: "600" }}>Register</Text>
         </Pressable>
