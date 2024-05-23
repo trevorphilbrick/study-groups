@@ -4,7 +4,14 @@ import MenuNavigator from "./MenuNavigator";
 import { useContext } from "react";
 import { UserContext } from "../App";
 
-const Root = createNativeStackNavigator();
+export type ScreenNames = ["Menu", "Auth"]; // type these manually
+export type ScreenProps = [undefined, undefined];
+export type RootStackParamList = Record<
+  ScreenNames[number],
+  ScreenProps[number]
+>;
+
+const Root = createNativeStackNavigator<RootStackParamList>();
 
 const RootNavigator = () => {
   const { user } = useContext(UserContext);

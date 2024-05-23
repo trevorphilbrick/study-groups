@@ -6,10 +6,11 @@ import { useNavigation } from "@react-navigation/native";
 import auth from "@react-native-firebase/auth";
 import Toast from "react-native-toast-message";
 import { UserContext } from "../App";
+import { AuthStackNavigation } from "../navigators/AuthNavigator";
 
 const LoginScreen = () => {
   const { top } = useSafeAreaInsets();
-  const navigation = useNavigation();
+  const navigation = useNavigation<AuthStackNavigation>();
   const { setUser } = useContext(UserContext);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -30,7 +31,7 @@ const LoginScreen = () => {
       .then((res) => {
         setIsSubmitting(false);
         setUser(res.user);
-        navigation.navigate("Menu");
+        navigation.navigate("Menu", { screen: "Home" });
         Toast.show({
           type: "success",
           text1: "Logged in",

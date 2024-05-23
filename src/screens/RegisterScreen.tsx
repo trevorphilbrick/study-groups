@@ -5,10 +5,11 @@ import { Button, TextInput } from "react-native-paper";
 import { useNavigation } from "@react-navigation/native";
 import auth from "@react-native-firebase/auth";
 import Toast from "react-native-toast-message";
+import { AuthStackNavigation } from "../navigators/AuthNavigator";
 
 const RegisterScreen = () => {
   const { top } = useSafeAreaInsets();
-  const navigation = useNavigation();
+  const navigation = useNavigation<AuthStackNavigation>();
   const [email, setEmail] = useState("");
   const [displayname, setDisplayname] = useState("");
   const [password, setPassword] = useState("");

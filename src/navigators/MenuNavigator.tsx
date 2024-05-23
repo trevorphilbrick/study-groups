@@ -1,8 +1,17 @@
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import HomeScreen from "../screens/HomeScreen";
 import CreateSetScreen from "../screens/CreateSetScreen";
+import { NavigationProp } from "@react-navigation/native";
 
-const Menu = createNativeStackNavigator();
+export type ScreenNames = ["Home", "CreateNoteCardSet", "Login"]; // type these manually
+export type ScreenProps = [undefined, undefined];
+export type MenuStackParamList = Record<
+  ScreenNames[number],
+  ScreenProps[number]
+>;
+export type MenuStackNavigation = NavigationProp<MenuStackParamList>;
+
+const Menu = createNativeStackNavigator<MenuStackParamList>();
 
 const MenuNavigator = () => {
   return (

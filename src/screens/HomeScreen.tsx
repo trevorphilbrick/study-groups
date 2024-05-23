@@ -5,10 +5,11 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Button, Card } from "react-native-paper";
 import auth from "@react-native-firebase/auth";
 import { useNavigation } from "@react-navigation/native";
+import { MenuStackNavigation } from "../navigators/MenuNavigator";
 
 const HomeScreen = () => {
   const { setUser, user } = useContext(UserContext);
-  const navigation = useNavigation();
+  const navigation = useNavigation<MenuStackNavigation>();
 
   const { top } = useSafeAreaInsets();
   return (
