@@ -1,9 +1,17 @@
-import React from "react";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import LoginScreen from "../screens/LoginScreen";
 import RegisterScreen from "../screens/RegisterScreen";
+import { NavigationProp } from "@react-navigation/native";
 
-const Auth = createNativeStackNavigator();
+export type ScreenNames = ["Login", "Register", "Menu"]; // type these manually
+export type ScreenProps = [undefined, undefined, { screen: "Home" }];
+export type AuthStackParamList = Record<
+  ScreenNames[number],
+  ScreenProps[number]
+>;
+export type AuthStackNavigation = NavigationProp<AuthStackParamList>;
+
+const Auth = createNativeStackNavigator<AuthStackParamList>();
 
 const AuthNavigator = () => {
   return (
