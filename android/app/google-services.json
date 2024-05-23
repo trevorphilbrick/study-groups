@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1083588345853",
+    "project_id": "study-groups-afd43",
+    "storage_bucket": "study-groups-afd43.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1083588345853:android:4cfd8df9498140de4f6394",
+        "android_client_info": {
+          "package_name": "com.studygroups"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDkgyd2FVk8MhZi7l0e4DBNTxdCFaSdUzk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
