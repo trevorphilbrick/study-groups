@@ -10,11 +10,12 @@ const RegisterScreen = () => {
   const { top } = useSafeAreaInsets();
   const navigation = useNavigation();
   const [email, setEmail] = useState("");
+  const [displayname, setDisplayname] = useState("");
   const [password, setPassword] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = () => {
-    if (!email || !password) {
+    if (!email || !password || !displayname) {
       Toast.show({
         type: "error",
         text1: "Missing fields",
@@ -25,7 +26,10 @@ const RegisterScreen = () => {
     setIsSubmitting(true);
     auth()
       .createUserWithEmailAndPassword(email, password)
-      .then(() => {
+      .then((user) => {
+        user.user.updateProfile({
+          displayName: displayname,
+        });
         setIsSubmitting(false);
         Toast.show({
           type: "success",
@@ -70,6 +74,12 @@ const RegisterScreen = () => {
         style={{ width: "100%", marginBottom: 16 }}
         value={email}
         onChange={(e) => setEmail(e.nativeEvent.text)}
+      />
+      <TextInput
+        label="Username"
+        style={{ width: "100%", marginBottom: 16 }}
+        value={displayname}
+        onChange={(e) => setDisplayname(e.nativeEvent.text)}
       />
       <TextInput
         label="Password"

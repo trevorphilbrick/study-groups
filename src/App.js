@@ -9,7 +9,7 @@ import Toast from "react-native-toast-message";
 export const UserContext = createContext(undefined);
 
 export default function App() {
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState();
 
   return (
     <UserContext.Provider value={{ user, setUser }}>
