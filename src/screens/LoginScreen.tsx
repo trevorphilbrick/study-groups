@@ -89,7 +89,7 @@ const LoginScreen = () => {
         </Pressable>
       </View>
       <Button
-        mode="contained"
+        mode="contained-tonal"
         style={{ width: "100%", marginBottom: 16 }}
         onPress={() => handleSubmit()}
         loading={isSubmitting}
