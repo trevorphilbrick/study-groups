@@ -2,6 +2,14 @@
   "expo": {
     "name": "study-groups",
     "slug": "study-groups",
-    "version": "1.0.0"
+    "version": "1.0.0",
+    "plugins": [
+      [
+        "expo-document-picker",
+        {
+          "iCloudContainerEnvironment": "Production"
+        }
+      ]
+    ]
   }
 }
