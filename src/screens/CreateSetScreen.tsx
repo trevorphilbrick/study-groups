@@ -9,6 +9,7 @@ import { nanoid } from "nanoid/non-secure";
 import Toast from "react-native-toast-message";
 import { useNavigation } from "@react-navigation/native";
 import { MenuStackNavigation } from "../navigators/MenuNavigator";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const CreateSetScreen = () => {
   const [cards, setCards] = useState<NoteCard[]>([]);
@@ -17,6 +18,7 @@ const CreateSetScreen = () => {
   const [loading, setLoading] = useState(false);
   const { user } = useContext(UserContext);
   const navigation = useNavigation<MenuStackNavigation>();
+  const { bottom } = useSafeAreaInsets();
 
   console.log(user);
 
@@ -97,31 +99,35 @@ const CreateSetScreen = () => {
           onChangeText={(val) => setDescription(val)}
         />
         <Text>Note Cards</Text>
-        <NoteCardForm setCards={setCards} />
+        <NoteCardForm setCards={setCards} setScreenLoading={setLoading} />
         <Button
           mode="contained"
           style={{ marginVertical: 16 }}
           onPress={() => handleCreateSet()}
+          loading={loading}
+          disabled={loading}
         >
           Create Set
         </Button>
-        {cards.length > 0 ? (
-          <View>
-            <Text style={{ textAlign: "center", marginBottom: 16 }}>
-              Your Cards
+        <View style={{ paddingBottom: bottom + 24 }}>
+          {cards.length > 0 ? (
+            <View>
+              <Text style={{ textAlign: "center", marginBottom: 16 }}>
+                Your Cards
+              </Text>
+              {cards.map((card, index) => (
+                <View key={index}>
+                  <Text>{card.prompt}</Text>
+                  <Text>{card.answer}</Text>
+                </View>
+              ))}
+            </View>
+          ) : (
+            <Text style={{ textAlign: "center" }}>
+              Looks like you haven&apos;t created any cards yet...
             </Text>
-            {cards.map((card, index) => (
-              <View key={index}>
-                <Text>{card.prompt}</Text>
-                <Text>{card.answer}</Text>
-              </View>
-            ))}
-          </View>
-        ) : (
-          <Text style={{ textAlign: "center" }}>
-            Looks like you haven&apos;t created any cards yet...
-          </Text>
-        )}
+          )}
+        </View>
       </ScrollView>
     </>
   );
