@@ -10,20 +10,36 @@ import Toast from "react-native-toast-message";
 import { useNavigation } from "@react-navigation/native";
 import { MenuStackNavigation } from "../navigators/MenuNavigator";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { addCardset } from "../api/addCardset";
+import { updateCardSet } from "../api/updateCardSet";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 const CreateSetScreen = () => {
   const [cards, setCards] = useState<NoteCard[]>([]);
+  const [cardSet, setCardSet] = useState(null);
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [loading, setLoading] = useState(false);
   const { user } = useContext(UserContext);
   const navigation = useNavigation<MenuStackNavigation>();
   const { bottom } = useSafeAreaInsets();
+  const queryClient = useQueryClient();
 
-  console.log(user);
+  const updateCardSetMutation = useMutation({
+    mutationFn: () => updateCardSet(cardSet, user),
+    onSuccess: (data) => {
+      queryClient.setQueryData(["cardSets"], data);
+    },
+  });
+
+  const addCardSetMutation = useMutation({
+    mutationFn: () => addCardset(cardSet, user),
+    onSuccess: (data) => {
+      queryClient.setQueryData(["cardSets"], data);
+    },
+  });
 
   const handleCreateSet = async () => {
-    // if name or cards is empty, show error toast
     if (!name || !cards.length) {
       Toast.show({
         type: "error",
@@ -35,14 +51,15 @@ const CreateSetScreen = () => {
     try {
       setLoading(true);
       // create payload
-      const cardSet = {
+      setCardSet({
         name,
         description,
         cards,
         user: user.uid,
         timestamp: new Date().toISOString(),
         setId: nanoid(),
-      };
+      });
+
       // ref for firestore document
       const documentRef = firestore()
         .collection("userCollections")
@@ -53,14 +70,10 @@ const CreateSetScreen = () => {
 
       if (!docSnapshot.exists) {
         // If the document does not exist, create it with an initial empty cardSets array
-        await documentRef.set({
-          cardSets: [cardSet],
-        });
+        addCardSetMutation.mutate();
       } else {
         // If the document exists, update the cardSets array
-        await documentRef.update({
-          cardSets: firestore.FieldValue.arrayUnion(cardSet),
-        });
+        updateCardSetMutation.mutate();
       }
       setName("");
       setDescription("");

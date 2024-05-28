@@ -5,6 +5,7 @@ module.exports = {
     "eslint:recommended",
     "plugin:react/recommended",
     "plugin:prettier/recommended",
+    "plugin:@tanstack/eslint-plugin-query/recommended",
   ],
   plugins: ["react", "react-native", "prettier"],
   rules: {

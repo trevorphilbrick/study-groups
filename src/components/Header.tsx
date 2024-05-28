@@ -1,7 +1,7 @@
 import { View, Pressable } from "react-native";
 import React from "react";
 import { Icon, Text } from "react-native-paper";
-import { theme } from "../App";
+import { theme } from "../constants/theme";
 import { useNavigation } from "@react-navigation/native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
