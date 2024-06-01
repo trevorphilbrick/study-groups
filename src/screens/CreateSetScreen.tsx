@@ -1,9 +1,9 @@
-import { ScrollView, View } from "react-native";
-import { Button, Text, TextInput } from "react-native-paper";
+import { FlatList, View } from "react-native";
+import { Button, Divider, Text, TextInput } from "react-native-paper";
 import NoteCardForm, { NoteCard } from "../components/NoteCardForm";
 import { useState, useContext } from "react";
 import { UserContext } from "../App";
-import firestore, { query } from "@react-native-firebase/firestore";
+import firestore from "@react-native-firebase/firestore";
 import { nanoid } from "nanoid/non-secure";
 import Toast from "react-native-toast-message";
 import { useNavigation } from "@react-navigation/native";
@@ -12,6 +12,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { addCardset } from "../api/addCardset";
 import { updateCardSet } from "../api/updateCardSet";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { theme } from "../constants/theme";
 
 const CreateSetScreen = () => {
   const [cards, setCards] = useState<NoteCard[]>([]);
@@ -51,7 +52,6 @@ const CreateSetScreen = () => {
     }
     try {
       setLoading(true);
-      // create payload
       setCardSet({
         name,
         description,
@@ -61,19 +61,15 @@ const CreateSetScreen = () => {
         setId: nanoid(),
       });
 
-      // ref for firestore document
       const documentRef = firestore()
         .collection("userCollections")
         .doc(user.uid);
 
-      // Check if the document exists
       const docSnapshot = await documentRef.get();
 
       if (!docSnapshot.exists) {
-        // If the document does not exist, create it with an initial empty cardSets array
         addCardSetMutation.mutate();
       } else {
-        // If the document exists, update the cardSets array
         updateCardSetMutation.mutate();
       }
       setName("");
@@ -87,58 +83,78 @@ const CreateSetScreen = () => {
   };
 
   return (
-    <ScrollView
-      style={{
-        paddingTop: 24,
-        flex: 1,
-        paddingHorizontal: 24,
-      }}
-    >
-      <Text>Card Set Name</Text>
-      <TextInput
-        placeholder="Enter set name"
-        style={{ marginVertical: 16 }}
-        value={name}
-        onChangeText={(val) => setName(val)}
-      />
-      <Text>{`Card Set Description (optional)`}</Text>
-      <TextInput
-        placeholder="Enter set description"
-        style={{ marginVertical: 16 }}
-        value={description}
-        onChangeText={(val) => setDescription(val)}
-      />
-      <Text>Note Cards</Text>
-      <NoteCardForm setCards={setCards} setScreenLoading={setLoading} />
-      <Button
-        mode="contained"
-        style={{ marginVertical: 16 }}
-        onPress={() => handleCreateSet()}
-        loading={loading}
-        disabled={loading}
-      >
-        Create Set
-      </Button>
-      <View style={{ paddingBottom: bottom + 24 }}>
-        {cards.length > 0 ? (
-          <View>
-            <Text style={{ textAlign: "center", marginBottom: 16 }}>
-              Your Cards
-            </Text>
-            {cards.map((card, index) => (
-              <View key={index}>
-                <Text>{card.prompt}</Text>
-                <Text>{card.answer}</Text>
-              </View>
-            ))}
-          </View>
-        ) : (
-          <Text style={{ textAlign: "center" }}>
-            Looks like you haven&apos;t created any cards yet...
+    // <ScrollView
+    //   style={{
+    //     paddingTop: 24,
+    //     flex: 1,
+    //     paddingHorizontal: 24,
+    //   }}
+    // >
+
+    // </ScrollView>
+
+    <FlatList
+      ListHeaderComponent={
+        <View style={{ paddingTop: 24, flex: 1, paddingHorizontal: 24 }}>
+          <Text style={{ color: theme.colors.onPrimary }}>Card Set Name</Text>
+          <TextInput
+            placeholder="Enter set name"
+            style={{ marginVertical: 16 }}
+            value={name}
+            onChangeText={(val) => setName(val)}
+          />
+          <Text
+            style={{ color: theme.colors.onPrimary }}
+          >{`Card Set Description (optional)`}</Text>
+          <TextInput
+            placeholder="Enter set description"
+            style={{ marginVertical: 16 }}
+            value={description}
+            onChangeText={(val) => setDescription(val)}
+          />
+          <Text style={{ color: theme.colors.onPrimary }}>Note Cards</Text>
+          <NoteCardForm setCards={setCards} setScreenLoading={setLoading} />
+          <Button
+            mode="contained"
+            style={{ marginTop: 16, marginBottom: 24 }}
+            buttonColor={theme.colors.secondary}
+            onPress={() => handleCreateSet()}
+            loading={loading}
+            disabled={loading}
+          >
+            Create Set
+          </Button>
+        </View>
+      }
+      renderItem={({ item }) => (
+        <View style={{ marginHorizontal: 24 }}>
+          <Text
+            style={{
+              fontSize: 16,
+              color: theme.colors.onPrimary,
+              fontWeight: "bold",
+              marginBottom: 8,
+            }}
+          >
+            {item.prompt}
           </Text>
-        )}
-      </View>
-    </ScrollView>
+          <Text
+            style={{
+              fontSize: 16,
+              color: theme.colors.onPrimary,
+            }}
+          >
+            {item.answer}
+          </Text>
+        </View>
+      )}
+      data={cards}
+      keyExtractor={(item, index) => index.toString() + item.prompt}
+      ItemSeparatorComponent={() => (
+        <Divider style={{ marginVertical: 16, marginHorizontal: 24 }} />
+      )}
+      ListFooterComponent={<View style={{ height: bottom }} />}
+    />
   );
 };
 

@@ -1,18 +1,19 @@
 import { View, Text, FlatList } from "react-native";
 import { useContext } from "react";
 import { UserContext } from "../App";
-import { Button } from "react-native-paper";
+import { ActivityIndicator, Button } from "react-native-paper";
 import { useNavigation } from "@react-navigation/native";
 import { MenuStackNavigation } from "../navigators/MenuNavigator";
 import { useQuery } from "@tanstack/react-query";
 import { getCardSets } from "../api/getCardSets";
 import CardSetContainer from "../components/CardSetContainer";
 import { theme } from "../constants/theme";
-import { queryClient } from "../queryClient";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const HomeScreen = () => {
   const { user } = useContext(UserContext);
   const navigation = useNavigation<MenuStackNavigation>();
+  const { bottom } = useSafeAreaInsets();
 
   const {
     data: cardSets,
@@ -60,7 +61,18 @@ const HomeScreen = () => {
           </Text>
         </Button>
       </View>
-      {isLoading && <Text>Loading...</Text>}
+      {isLoading && (
+        <View
+          style={{ flex: 1, marginBottom: bottom, justifyContent: "center" }}
+        >
+          <ActivityIndicator
+            animating={isLoading}
+            size="large"
+            color={theme.colors.secondary}
+          />
+        </View>
+      )}
+
       {isError && <Text>Error fetching card sets</Text>}
       {isSuccess && cardSets.length === 0 && (
         <Text style={{ marginBottom: 8 }}>
@@ -69,7 +81,7 @@ const HomeScreen = () => {
       )}
       {isSuccess && cardSets.length > 0 && (
         <FlatList
-          data={queryClient.getQueryData(["cardSets", user])}
+          data={cardSets}
           renderItem={({ item }) => (
             <CardSetContainer item={item} key={item.id} />
           )}

@@ -4,6 +4,7 @@ import React from "react";
 import DocumentPicker from "react-native-document-picker";
 import axios from "axios";
 import { View } from "react-native";
+import { theme } from "../constants/theme";
 
 export type NoteCard = {
   prompt: string;
@@ -66,6 +67,7 @@ const NoteCardForm = ({ setCards, setScreenLoading }: NoteCardFormProps) => {
       setCards((cards: NoteCard[]): NoteCard[] => [...cards, ...response.data]);
     } catch (err) {
       if (DocumentPicker.isCancel(err)) {
+        console.error("User cancelled document selection");
       } else {
         console.error("Error during document selection or file upload: ", err);
       }
@@ -84,16 +86,22 @@ const NoteCardForm = ({ setCards, setScreenLoading }: NoteCardFormProps) => {
         label="Answer"
         value={answer}
         onChangeText={setAnswer}
-        style={{ marginVertical: 8 }}
+        style={{ marginTop: 8, marginBottom: 16 }}
       />
       <View
         style={{
           flexDirection: "row",
           alignItems: "center",
           justifyContent: "space-between",
+          marginBottom: 16,
         }}
       >
-        <Button onPress={handleAddCard} style={{ marginTop: 16 }}>
+        <Button
+          onPress={handleAddCard}
+          style={{ marginTop: 16 }}
+          mode="outlined"
+          textColor={theme.colors.secondary}
+        >
           Add Card
         </Button>
         <Button
@@ -101,6 +109,9 @@ const NoteCardForm = ({ setCards, setScreenLoading }: NoteCardFormProps) => {
           style={{ marginTop: 16 }}
           loading={loading}
           disabled={loading}
+          mode="outlined"
+          textColor={theme.colors.secondary}
+          icon="creation"
         >
           Let AI Create Cards
         </Button>

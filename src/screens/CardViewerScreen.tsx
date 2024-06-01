@@ -69,6 +69,7 @@ const CardViewerScreen = () => {
                 fontSize: 24,
                 color: theme.colors.onBackground,
                 textAlign: "center",
+                overflow: "scroll",
               }}
             >
               {showAnswer
