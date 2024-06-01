@@ -1,5 +1,6 @@
 import firestore from "@react-native-firebase/firestore";
 import { CardSet } from "./updateCardSet";
+import { FirebaseAuthTypes } from "@react-native-firebase/auth";
 
 export async function addCardset(
   cardSet: CardSet,
@@ -12,9 +13,5 @@ export async function addCardset(
     cardSets: [cardSet],
   });
 
-  const res = await documentRef.get();
-
-  console.log("added set", res.data().cardSets);
-
-  return res.data().cardSets;
+  return { status: "success", message: "Cardset added successfully" };
 }

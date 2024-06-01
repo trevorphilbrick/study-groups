@@ -5,14 +5,19 @@ import { useMutation } from "@tanstack/react-query";
 import { deleteCardSet } from "../api/deleteCardset";
 import { UserContext } from "../App";
 import { queryClient } from "../queryClient";
+import { useNavigation } from "@react-navigation/native";
+import { MenuStackNavigation } from "../navigators/MenuNavigator";
+import { theme } from "../constants/theme";
 
 const CardSetContainer = ({ item }) => {
+  const navigation = useNavigation<MenuStackNavigation>();
   const [showMenu, setShowMenu] = useState(false);
+  const [isPressed, setIsPressed] = useState(false);
   const { user } = useContext(UserContext);
   const deleteCardSetMutation = useMutation({
     mutationFn: () => deleteCardSet(item, user),
-    onSuccess: (data) => {
-      queryClient.setQueryData(["cardSets"], data);
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["cardSets"] });
     },
   });
 
@@ -21,17 +26,37 @@ const CardSetContainer = ({ item }) => {
       style={{
         marginVertical: 8,
         borderRadius: 8,
+        backgroundColor: isPressed
+          ? theme.colors.primaryPressed
+          : theme.colors.primary,
       }}
+      onPress={() => navigation.navigate("CardViewer", { id: item.setId })}
+      onPressIn={() => setIsPressed(true)}
+      onPressOut={() => setIsPressed(false)}
+      onLongPress={() => setShowMenu(true)}
+      elevation={2}
     >
       <Card.Title
         title={item.name}
+        titleStyle={{ color: theme.colors.onPrimary, fontSize: 18 }}
         subtitle={item.description}
+        subtitleStyle={{ color: theme.colors.onPrimary }}
         right={() => (
-          <IconButton icon="dots-vertical" onPress={() => setShowMenu(true)} />
+          <IconButton
+            icon="dots-vertical"
+            onPress={() => setShowMenu(true)}
+            iconColor={theme.colors.onPrimary}
+          />
         )}
       />
       <Card.Content>
-        <Text style={{ textAlign: "right" }}>
+        <Text
+          style={{
+            textAlign: "right",
+            color: theme.colors.onPrimary,
+            marginBottom: 16,
+          }}
+        >
           {new Date(item.timestamp).toUTCString()}
         </Text>
       </Card.Content>

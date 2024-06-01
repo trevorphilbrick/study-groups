@@ -22,9 +22,5 @@ export async function deleteCardSet(
     cardSets: firestore.FieldValue.arrayRemove(cardSet),
   });
 
-  const res = await documentRef.get();
-
-  console.log("updated sets", res.data().cardSets);
-
-  return res.data().cardSets;
+  return { status: "success", message: "Cardset deleted successfully" };
 }
