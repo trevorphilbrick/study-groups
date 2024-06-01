@@ -42,6 +42,7 @@ const NoteCardForm = ({ setCards, setScreenLoading }: NoteCardFormProps) => {
       });
 
       const formData = new FormData();
+      // @ts-ignore
       formData.append("document", {
         uri: res[0].uri,
         type: res[0].type,
@@ -60,13 +61,11 @@ const NoteCardForm = ({ setCards, setScreenLoading }: NoteCardFormProps) => {
         },
       );
 
-      console.log("File uploaded successfully:", response.data);
       setLoading(false);
       setScreenLoading(false);
       setCards((cards: NoteCard[]): NoteCard[] => [...cards, ...response.data]);
     } catch (err) {
       if (DocumentPicker.isCancel(err)) {
-        console.log("User cancelled the document picker");
       } else {
         console.error("Error during document selection or file upload: ", err);
       }

@@ -1,10 +1,9 @@
 import { ScrollView, View } from "react-native";
-import Header from "../components/Header";
 import { Button, Text, TextInput } from "react-native-paper";
 import NoteCardForm, { NoteCard } from "../components/NoteCardForm";
 import { useState, useContext } from "react";
 import { UserContext } from "../App";
-import firestore from "@react-native-firebase/firestore";
+import firestore, { query } from "@react-native-firebase/firestore";
 import { nanoid } from "nanoid/non-secure";
 import Toast from "react-native-toast-message";
 import { useNavigation } from "@react-navigation/native";
@@ -27,15 +26,17 @@ const CreateSetScreen = () => {
 
   const updateCardSetMutation = useMutation({
     mutationFn: () => updateCardSet(cardSet, user),
-    onSuccess: (data) => {
-      queryClient.setQueryData(["cardSets"], data);
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["cardSets"] });
+      navigation.navigate("Home");
     },
   });
 
   const addCardSetMutation = useMutation({
     mutationFn: () => addCardset(cardSet, user),
-    onSuccess: (data) => {
-      queryClient.setQueryData(["cardSets"], data);
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["cardSets"] });
+      navigation.navigate("Home");
     },
   });
 
@@ -79,7 +80,6 @@ const CreateSetScreen = () => {
       setDescription("");
       setCards([]);
       setLoading(false);
-      navigation.navigate("Home");
     } catch (error) {
       setLoading(false);
       console.error(error);
@@ -87,62 +87,58 @@ const CreateSetScreen = () => {
   };
 
   return (
-    <>
-      <Header title="Create Set" />
-
-      <ScrollView
-        style={{
-          paddingTop: 24,
-          flex: 1,
-          paddingHorizontal: 24,
-        }}
+    <ScrollView
+      style={{
+        paddingTop: 24,
+        flex: 1,
+        paddingHorizontal: 24,
+      }}
+    >
+      <Text>Card Set Name</Text>
+      <TextInput
+        placeholder="Enter set name"
+        style={{ marginVertical: 16 }}
+        value={name}
+        onChangeText={(val) => setName(val)}
+      />
+      <Text>{`Card Set Description (optional)`}</Text>
+      <TextInput
+        placeholder="Enter set description"
+        style={{ marginVertical: 16 }}
+        value={description}
+        onChangeText={(val) => setDescription(val)}
+      />
+      <Text>Note Cards</Text>
+      <NoteCardForm setCards={setCards} setScreenLoading={setLoading} />
+      <Button
+        mode="contained"
+        style={{ marginVertical: 16 }}
+        onPress={() => handleCreateSet()}
+        loading={loading}
+        disabled={loading}
       >
-        <Text>Card Set Name</Text>
-        <TextInput
-          placeholder="Enter set name"
-          style={{ marginVertical: 16 }}
-          value={name}
-          onChangeText={(val) => setName(val)}
-        />
-        <Text>{`Card Set Description (optional)`}</Text>
-        <TextInput
-          placeholder="Enter set description"
-          style={{ marginVertical: 16 }}
-          value={description}
-          onChangeText={(val) => setDescription(val)}
-        />
-        <Text>Note Cards</Text>
-        <NoteCardForm setCards={setCards} setScreenLoading={setLoading} />
-        <Button
-          mode="contained"
-          style={{ marginVertical: 16 }}
-          onPress={() => handleCreateSet()}
-          loading={loading}
-          disabled={loading}
-        >
-          Create Set
-        </Button>
-        <View style={{ paddingBottom: bottom + 24 }}>
-          {cards.length > 0 ? (
-            <View>
-              <Text style={{ textAlign: "center", marginBottom: 16 }}>
-                Your Cards
-              </Text>
-              {cards.map((card, index) => (
-                <View key={index}>
-                  <Text>{card.prompt}</Text>
-                  <Text>{card.answer}</Text>
-                </View>
-              ))}
-            </View>
-          ) : (
-            <Text style={{ textAlign: "center" }}>
-              Looks like you haven&apos;t created any cards yet...
+        Create Set
+      </Button>
+      <View style={{ paddingBottom: bottom + 24 }}>
+        {cards.length > 0 ? (
+          <View>
+            <Text style={{ textAlign: "center", marginBottom: 16 }}>
+              Your Cards
             </Text>
-          )}
-        </View>
-      </ScrollView>
-    </>
+            {cards.map((card, index) => (
+              <View key={index}>
+                <Text>{card.prompt}</Text>
+                <Text>{card.answer}</Text>
+              </View>
+            ))}
+          </View>
+        ) : (
+          <Text style={{ textAlign: "center" }}>
+            Looks like you haven&apos;t created any cards yet...
+          </Text>
+        )}
+      </View>
+    </ScrollView>
   );
 };
 

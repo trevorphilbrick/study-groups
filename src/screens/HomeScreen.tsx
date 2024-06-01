@@ -1,19 +1,18 @@
 import { View, Text, FlatList } from "react-native";
-import { useContext, useEffect } from "react";
+import { useContext } from "react";
 import { UserContext } from "../App";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { Button, Card } from "react-native-paper";
-import auth from "@react-native-firebase/auth";
+import { Button } from "react-native-paper";
 import { useNavigation } from "@react-navigation/native";
 import { MenuStackNavigation } from "../navigators/MenuNavigator";
 import { useQuery } from "@tanstack/react-query";
 import { getCardSets } from "../api/getCardSets";
 import CardSetContainer from "../components/CardSetContainer";
+import { theme } from "../constants/theme";
+import { queryClient } from "../queryClient";
 
 const HomeScreen = () => {
-  const { setUser, user } = useContext(UserContext);
+  const { user } = useContext(UserContext);
   const navigation = useNavigation<MenuStackNavigation>();
-  const { top } = useSafeAreaInsets();
 
   const {
     data: cardSets,
@@ -21,14 +20,14 @@ const HomeScreen = () => {
     isError,
     isSuccess,
   } = useQuery({
-    queryKey: ["cardSets"],
+    queryKey: ["cardSets", user],
     queryFn: () => getCardSets(user),
   });
 
   return (
     <View
       style={{
-        marginTop: top,
+        marginTop: 16,
         flex: 1,
         marginHorizontal: 24,
       }}
@@ -38,33 +37,27 @@ const HomeScreen = () => {
           flexDirection: "row",
           justifyContent: "space-between",
           alignItems: "center",
-          marginBottom: 24,
+          marginVertical: 24,
         }}
       >
-        <Text>Hello {user?.displayName}</Text>
+        <Text style={{ color: theme.colors.onPrimary, fontSize: 24 }}>
+          Your Sets
+        </Text>
         <Button
-          onPress={() =>
-            auth()
-              .signOut()
-              .then(() => {
-                setUser(null);
-                navigation.navigate("Login");
-              })
-          }
+          onPress={() => navigation.navigate("CreateNoteCardSet")}
+          mode="contained"
+          buttonColor={theme.colors.secondary}
+          icon={"plus"}
         >
-          Sign out
-        </Button>
-      </View>
-      <View
-        style={{
-          flexDirection: "row",
-          justifyContent: "space-between",
-          alignItems: "center",
-        }}
-      >
-        <Text>Your Card Sets</Text>
-        <Button onPress={() => navigation.navigate("CreateNoteCardSet")}>
-          Create Note Card Set
+          <Text
+            style={{
+              color: theme.colors.onPrimary,
+              fontWeight: "bold",
+              fontSize: 16,
+            }}
+          >
+            Create Note Card Set
+          </Text>
         </Button>
       </View>
       {isLoading && <Text>Loading...</Text>}
@@ -76,8 +69,10 @@ const HomeScreen = () => {
       )}
       {isSuccess && cardSets.length > 0 && (
         <FlatList
-          data={cardSets}
-          renderItem={({ item }) => <CardSetContainer item={item} />}
+          data={queryClient.getQueryData(["cardSets", user])}
+          renderItem={({ item }) => (
+            <CardSetContainer item={item} key={item.id} />
+          )}
           keyExtractor={(item) => item.id}
         />
       )}

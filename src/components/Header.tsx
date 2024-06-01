@@ -32,7 +32,6 @@ const Header = ({ title }: { title: string }) => {
         style={{
           marginRight: 24,
           padding: 6,
-          backgroundColor: theme.colors.surface,
           borderRadius: 24,
           shadowColor: "#000",
           shadowOffset: {

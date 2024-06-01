@@ -1,10 +1,11 @@
 export const theme = {
   colors: {
     primary: "rgb(0, 100, 148)",
+    primaryPressed: "rgb(0, 91, 133)",
     onPrimary: "rgb(255, 255, 255)",
     primaryContainer: "rgb(203, 230, 255)",
     onPrimaryContainer: "rgb(0, 30, 48)",
-    secondary: "rgb(0, 105, 107)",
+    secondary: "rgb(115, 191, 77)",
     onSecondary: "rgb(255, 255, 255)",
     secondaryContainer: "rgb(111, 246, 249)",
     onSecondaryContainer: "rgb(0, 32, 32)",
@@ -16,8 +17,8 @@ export const theme = {
     onError: "rgb(255, 255, 255)",
     errorContainer: "rgb(255, 218, 214)",
     onErrorContainer: "rgb(65, 0, 2)",
-    background: "rgb(252, 252, 255)",
-    onBackground: "rgb(26, 28, 30)",
+    background: "rgb(0, 73, 106)",
+    onBackground: "rgb(241, 242, 242)",
     surface: "rgb(252, 252, 255)",
     onSurface: "rgb(26, 28, 30)",
     surfaceVariant: "rgb(221, 227, 234)",
