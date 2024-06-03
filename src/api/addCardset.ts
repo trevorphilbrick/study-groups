@@ -1,5 +1,5 @@
 import firestore from "@react-native-firebase/firestore";
-import { CardSet } from "./updateCardSet";
+import { CardSet } from "./updateCardSets";
 import { FirebaseAuthTypes } from "@react-native-firebase/auth";
 
 export async function addCardset(

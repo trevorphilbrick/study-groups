@@ -1,17 +1,19 @@
-import { View, Text } from "react-native";
+import { View, Text, ScrollView } from "react-native";
 import { getCardSets } from "../api/getCardSets";
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { UserContext } from "../App";
 import { useQuery } from "@tanstack/react-query";
 import { RouteProp, useRoute } from "@react-navigation/native";
 import { MenuStackParamList } from "../navigators/MenuNavigator";
-import { CardSet } from "../api/updateCardSet";
+import { CardSet } from "../api/updateCardSets";
 import { theme } from "../constants/theme";
 import { IconButton, ProgressBar } from "react-native-paper";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { CardViewerHeaderTitle } from "../navigators/MenuNavigator";
 
 const CardViewerScreen = () => {
   const { user } = useContext(UserContext);
+  const { setHeaderTitle } = useContext(CardViewerHeaderTitle);
   const route = useRoute<RouteProp<MenuStackParamList, "CardViewer">>();
   const { id } = route.params;
   const { bottom } = useSafeAreaInsets();
@@ -32,6 +34,12 @@ const CardViewerScreen = () => {
     (cardSet: CardSet) => cardSet.setId === id,
   );
 
+  useEffect(() => {
+    if (currentCardSet) {
+      setHeaderTitle(currentCardSet.name);
+    }
+  }, [currentCardSet, setHeaderTitle]);
+
   return (
     <View>
       {isLoading && <Text>Loading...</Text>}
@@ -50,6 +58,7 @@ const CardViewerScreen = () => {
               flex: 1,
               justifyContent: "space-between",
               marginVertical: 24,
+              flexWrap: "nowrap",
             }}
           >
             <View>
@@ -64,18 +73,26 @@ const CardViewerScreen = () => {
                 {showAnswer ? "Answer" : "Prompt"}
               </Text>
             </View>
-            <Text
-              style={{
-                fontSize: 24,
-                color: theme.colors.onBackground,
-                textAlign: "center",
-                overflow: "scroll",
+            <ScrollView
+              contentContainerStyle={{
+                justifyContent: "center",
+                alignItems: "center",
+                flexGrow: 1,
               }}
             >
-              {showAnswer
-                ? currentCardSet?.cards[currentCardIndex].answer
-                : currentCardSet?.cards[currentCardIndex].prompt}
-            </Text>
+              <Text
+                style={{
+                  fontSize: 24,
+                  color: theme.colors.onBackground,
+                  textAlign: "center",
+                  overflow: "scroll",
+                }}
+              >
+                {showAnswer
+                  ? currentCardSet?.cards[currentCardIndex].answer
+                  : currentCardSet?.cards[currentCardIndex].prompt}
+              </Text>
+            </ScrollView>
             <View>
               <ProgressBar
                 progress={(currentCardIndex + 1) / currentCardSet?.cards.length}

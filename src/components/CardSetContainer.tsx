@@ -72,7 +72,11 @@ const CardSetContainer = ({ item }) => {
           <Card style={{ width: 200 }}>
             <Card.Title title={item.name} />
             <Card.Content>
-              <Button>Edit</Button>
+              <Button
+                onPress={() => navigation.navigate("CreateNoteCardSet", item)}
+              >
+                Edit
+              </Button>
               <Button onPress={() => deleteCardSetMutation.mutate()}>
                 Delete
               </Button>
