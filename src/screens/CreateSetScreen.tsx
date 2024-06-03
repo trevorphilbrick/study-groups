@@ -1,18 +1,23 @@
-import { FlatList, View } from "react-native";
-import { Button, Divider, Text, TextInput } from "react-native-paper";
+import { FlatList, View, Text } from "react-native";
+import { Button, Divider, TextInput } from "react-native-paper";
 import NoteCardForm, { NoteCard } from "../components/NoteCardForm";
-import { useState, useContext } from "react";
+import { useState, useContext, useEffect } from "react";
 import { UserContext } from "../App";
 import firestore from "@react-native-firebase/firestore";
 import { nanoid } from "nanoid/non-secure";
 import Toast from "react-native-toast-message";
-import { useNavigation } from "@react-navigation/native";
-import { MenuStackNavigation } from "../navigators/MenuNavigator";
+import { RouteProp, useNavigation, useRoute } from "@react-navigation/native";
+import {
+  MenuStackNavigation,
+  MenuStackParamList,
+} from "../navigators/MenuNavigator";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { addCardset } from "../api/addCardset";
-import { updateCardSet } from "../api/updateCardSet";
+import { updateCardSets } from "../api/updateCardSets";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { theme } from "../constants/theme";
+import CardContainer from "../components/CardContainer";
+import { updateCardSet } from "../api/updateCardSet";
 
 const CreateSetScreen = () => {
   const [cards, setCards] = useState<NoteCard[]>([]);
@@ -24,9 +29,11 @@ const CreateSetScreen = () => {
   const navigation = useNavigation<MenuStackNavigation>();
   const { bottom } = useSafeAreaInsets();
   const queryClient = useQueryClient();
+  const { params } =
+    useRoute<RouteProp<MenuStackParamList, "CreateNoteCardSet">>();
 
-  const updateCardSetMutation = useMutation({
-    mutationFn: () => updateCardSet(cardSet, user),
+  const updateCardSetsMutation = useMutation({
+    mutationFn: () => updateCardSets(cardSet, user),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["cardSets"] });
       navigation.navigate("Home");
@@ -35,6 +42,14 @@ const CreateSetScreen = () => {
 
   const addCardSetMutation = useMutation({
     mutationFn: () => addCardset(cardSet, user),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["cardSets"] });
+      navigation.navigate("Home");
+    },
+  });
+
+  const updateCardSetMutation = useMutation({
+    mutationFn: () => updateCardSet(cardSet, user),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["cardSets"] });
       navigation.navigate("Home");
@@ -70,7 +85,7 @@ const CreateSetScreen = () => {
       if (!docSnapshot.exists) {
         addCardSetMutation.mutate();
       } else {
-        updateCardSetMutation.mutate();
+        updateCardSetsMutation.mutate();
       }
       setName("");
       setDescription("");
@@ -82,17 +97,37 @@ const CreateSetScreen = () => {
     }
   };
 
+  const updateSet = async () => {
+    try {
+      setLoading(true);
+      setCardSet({
+        name,
+        description,
+        cards,
+        user: user.uid,
+        timestamp: new Date().toISOString(),
+        setId: cardSet.setId,
+      });
+
+      updateCardSetMutation.mutate(cardSet, user);
+
+      setLoading(false);
+    } catch (error) {
+      setLoading(false);
+      console.error(error);
+    }
+  };
+
+  useEffect(() => {
+    if (params) {
+      setCardSet(params);
+      setName(params.name);
+      setDescription(params.description);
+      setCards(params.cards);
+    }
+  }, [params]);
+
   return (
-    // <ScrollView
-    //   style={{
-    //     paddingTop: 24,
-    //     flex: 1,
-    //     paddingHorizontal: 24,
-    //   }}
-    // >
-
-    // </ScrollView>
-
     <FlatList
       ListHeaderComponent={
         <View style={{ paddingTop: 24, flex: 1, paddingHorizontal: 24 }}>
@@ -118,36 +153,17 @@ const CreateSetScreen = () => {
             mode="contained"
             style={{ marginTop: 16, marginBottom: 24 }}
             buttonColor={theme.colors.secondary}
-            onPress={() => handleCreateSet()}
+            onPress={() => {
+              params ? updateSet() : handleCreateSet();
+            }}
             loading={loading}
             disabled={loading}
           >
-            Create Set
+            {params ? "Update Set" : "Create Set"}
           </Button>
         </View>
       }
-      renderItem={({ item }) => (
-        <View style={{ marginHorizontal: 24 }}>
-          <Text
-            style={{
-              fontSize: 16,
-              color: theme.colors.onPrimary,
-              fontWeight: "bold",
-              marginBottom: 8,
-            }}
-          >
-            {item.prompt}
-          </Text>
-          <Text
-            style={{
-              fontSize: 16,
-              color: theme.colors.onPrimary,
-            }}
-          >
-            {item.answer}
-          </Text>
-        </View>
-      )}
+      renderItem={({ item }) => <CardContainer item={item} key={item.prompt} />}
       data={cards}
       keyExtractor={(item, index) => index.toString() + item.prompt}
       ItemSeparatorComponent={() => (

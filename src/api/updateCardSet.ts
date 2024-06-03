@@ -1,15 +1,6 @@
-import firestore from "@react-native-firebase/firestore";
-import { NoteCard } from "../components/NoteCardForm";
 import { FirebaseAuthTypes } from "@react-native-firebase/auth";
-
-export type CardSet = {
-  name: string;
-  description: string;
-  cards: NoteCard[];
-  user: string;
-  timestamp: string;
-  setId: string;
-};
+import { CardSet } from "./deleteCardset";
+import firestore from "@react-native-firebase/firestore";
 
 export async function updateCardSet(
   cardSet: CardSet,
@@ -18,10 +9,20 @@ export async function updateCardSet(
   // ref for firestore document
   const documentRef = firestore().collection("userCollections").doc(user.uid);
 
-  await documentRef.update({
-    cardSets: firestore.FieldValue.arrayUnion(cardSet),
+  const doc = await documentRef.get();
+
+  const cardSets = doc.data().cardSets;
+
+  const updatedCardSets = cardSets.map((set: CardSet) => {
+    if (set.setId === cardSet.setId) {
+      return cardSet;
+    }
+    return set;
   });
 
-  // return res.data().cardSets;
-  return { status: "success", message: "Card Set Updated" };
+  await documentRef.update({
+    cardSets: updatedCardSets,
+  });
+
+  console.log("cardSet", cardSet);
 }
