@@ -1,5 +1,5 @@
 import { Text } from "react-native";
-import { useContext, useState } from "react";
+import { useContext, useState, Dispatch, SetStateAction } from "react";
 import { Button, Card, IconButton, Modal, Portal } from "react-native-paper";
 import { useMutation } from "@tanstack/react-query";
 import { deleteCardSet } from "../api/deleteCardset";
@@ -8,6 +8,32 @@ import { queryClient } from "../queryClient";
 import { useNavigation } from "@react-navigation/native";
 import { MenuStackNavigation } from "../navigators/MenuNavigator";
 import { theme } from "../constants/theme";
+import styled from "styled-components/native";
+
+const CardSetCardContainer = styled(Card)<{ isPressed: boolean }>`
+  margin-vertical: 8px;
+  border-radius: 8px;
+  background-color: ${(props) =>
+    props.isPressed ? theme.colors.primaryPressed : theme.colors.primary};
+`;
+
+const DateText = styled(Text)`
+  text-align: right;
+  color: ${theme.colors.onPrimary};
+  margin-bottom: 16px;
+`;
+
+const ModalCardContainer = styled(Card)`
+  width: 200px;
+`;
+
+const CardTitleRight = (setShowMenu: Dispatch<SetStateAction<boolean>>) => (
+  <IconButton
+    icon="dots-vertical"
+    iconColor={theme.colors.onPrimary}
+    onPress={() => setShowMenu(true)}
+  />
+);
 
 const CardSetContainer = ({ item }) => {
   const navigation = useNavigation<MenuStackNavigation>();
@@ -22,14 +48,8 @@ const CardSetContainer = ({ item }) => {
   });
 
   return (
-    <Card
-      style={{
-        marginVertical: 8,
-        borderRadius: 8,
-        backgroundColor: isPressed
-          ? theme.colors.primaryPressed
-          : theme.colors.primary,
-      }}
+    <CardSetCardContainer
+      isPressed={isPressed}
       onPress={() => navigation.navigate("CardViewer", { id: item.setId })}
       onPressIn={() => setIsPressed(true)}
       onPressOut={() => setIsPressed(false)}
@@ -38,27 +58,14 @@ const CardSetContainer = ({ item }) => {
     >
       <Card.Title
         title={item.name}
-        titleStyle={{ color: theme.colors.onPrimary, fontSize: 18 }}
+        titleStyle={{ color: theme.colors.onPrimary }}
+        titleVariant="titleMedium"
         subtitle={item.description}
         subtitleStyle={{ color: theme.colors.onPrimary }}
-        right={() => (
-          <IconButton
-            icon="dots-vertical"
-            onPress={() => setShowMenu(true)}
-            iconColor={theme.colors.onPrimary}
-          />
-        )}
+        right={() => CardTitleRight(setShowMenu)}
       />
       <Card.Content>
-        <Text
-          style={{
-            textAlign: "right",
-            color: theme.colors.onPrimary,
-            marginBottom: 16,
-          }}
-        >
-          {new Date(item.timestamp).toUTCString()}
-        </Text>
+        <DateText>{new Date(item.timestamp).toUTCString()}</DateText>
       </Card.Content>
       <Portal>
         <Modal
@@ -69,11 +76,14 @@ const CardSetContainer = ({ item }) => {
             alignItems: "center",
           }}
         >
-          <Card style={{ width: 200 }}>
+          <ModalCardContainer>
             <Card.Title title={item.name} />
             <Card.Content>
               <Button
-                onPress={() => navigation.navigate("CreateNoteCardSet", item)}
+                onPress={() => {
+                  navigation.navigate("CreateNoteCardSet", item);
+                  setShowMenu(false);
+                }}
               >
                 Edit
               </Button>
@@ -82,10 +92,10 @@ const CardSetContainer = ({ item }) => {
               </Button>
               <Button onPress={() => setShowMenu(false)}>Close</Button>
             </Card.Content>
-          </Card>
+          </ModalCardContainer>
         </Modal>
       </Portal>
-    </Card>
+    </CardSetCardContainer>
   );
 };
 

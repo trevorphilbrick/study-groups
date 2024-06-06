@@ -86,6 +86,7 @@ const HomeScreen = () => {
             <CardSetContainer item={item} key={item.id} />
           )}
           keyExtractor={(item) => item.id}
+          ListFooterComponent={<View style={{ marginBottom: 24 }} />}
         />
       )}
     </View>

@@ -3,8 +3,9 @@ import { TextInput, Button } from "react-native-paper";
 import React from "react";
 import DocumentPicker from "react-native-document-picker";
 import axios from "axios";
-import { View } from "react-native";
+import { Platform, View } from "react-native";
 import { theme } from "../constants/theme";
+import styled from "styled-components/native";
 
 export type NoteCard = {
   prompt: string;
@@ -15,6 +16,23 @@ export type NoteCardFormProps = {
   setCards: React.Dispatch<React.SetStateAction<NoteCard[]>>;
   setScreenLoading: React.Dispatch<React.SetStateAction<boolean>>;
 };
+
+const PromptInput = styled(TextInput)`
+  margin-bottom: 8px;
+`;
+
+const AnswerInput = styled(TextInput)`
+  margin-top: 8px;
+  margin-bottom: 16px;
+`;
+
+const ButtonContainer = styled.View`
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+  margin-top: 16px;
+`;
 
 const NoteCardForm = ({ setCards, setScreenLoading }: NoteCardFormProps) => {
   const [prompt, setPrompt] = useState("");
@@ -43,9 +61,14 @@ const NoteCardForm = ({ setCards, setScreenLoading }: NoteCardFormProps) => {
       });
 
       const formData = new FormData();
+
+      const fileUri = res[0].uri;
+
+      console.log(fileUri);
+
       // @ts-ignore
       formData.append("document", {
-        uri: res[0].uri,
+        uri: fileUri,
         type: res[0].type,
         name: res[0].name,
       });
@@ -57,7 +80,7 @@ const NoteCardForm = ({ setCards, setScreenLoading }: NoteCardFormProps) => {
         formData,
         {
           headers: {
-            "Content-Type": res[0].type,
+            "Content-Type": "multipart/form-data",
           },
         },
       );
@@ -76,29 +99,11 @@ const NoteCardForm = ({ setCards, setScreenLoading }: NoteCardFormProps) => {
 
   return (
     <>
-      <TextInput
-        label="Prompt"
-        value={prompt}
-        onChangeText={setPrompt}
-        style={{ marginVertical: 8 }}
-      />
-      <TextInput
-        label="Answer"
-        value={answer}
-        onChangeText={setAnswer}
-        style={{ marginTop: 8, marginBottom: 16 }}
-      />
-      <View
-        style={{
-          flexDirection: "row",
-          alignItems: "center",
-          justifyContent: "space-between",
-          marginBottom: 16,
-        }}
-      >
+      <PromptInput label="Prompt" value={prompt} onChangeText={setPrompt} />
+      <AnswerInput label="Answer" value={answer} onChangeText={setAnswer} />
+      <ButtonContainer>
         <Button
           onPress={handleAddCard}
-          style={{ marginTop: 16 }}
           mode="outlined"
           textColor={theme.colors.secondary}
         >
@@ -106,7 +111,6 @@ const NoteCardForm = ({ setCards, setScreenLoading }: NoteCardFormProps) => {
         </Button>
         <Button
           onPress={handleAddAICards}
-          style={{ marginTop: 16 }}
           loading={loading}
           disabled={loading}
           mode="outlined"
@@ -115,7 +119,7 @@ const NoteCardForm = ({ setCards, setScreenLoading }: NoteCardFormProps) => {
         >
           Let AI Create Cards
         </Button>
-      </View>
+      </ButtonContainer>
     </>
   );
 };

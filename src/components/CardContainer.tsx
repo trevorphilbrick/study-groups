@@ -2,6 +2,33 @@ import { View, Text, Pressable } from "react-native";
 import { useState } from "react";
 import { theme } from "../constants/theme";
 import { Button, Card, Modal, Portal } from "react-native-paper";
+import styled from "styled-components/native";
+
+const ModalCardContainer = styled(Card)`
+  width: 200px;
+`;
+
+const PromptContainer = styled.View`
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+`;
+
+const CardPressable = styled.Pressable`
+  margin-horizontal: 24px;
+`;
+
+const PromptText = styled.Text`
+  font-size: 16px;
+  color: ${theme.colors.onPrimary};
+  font-weight: bold;
+  margin-bottom: 8px;
+`;
+
+const AnswerText = styled.Text`
+  font-size: 16px;
+  color: ${theme.colors.onPrimary};
+`;
 
 const CardContainer = ({ item }) => {
   const [showModal, setShowModal] = useState(false);
@@ -16,7 +43,7 @@ const CardContainer = ({ item }) => {
             alignItems: "center",
           }}
         >
-          <Card style={{ width: 200 }}>
+          <ModalCardContainer>
             <Card.Title
               title="Delete Card?"
               titleStyle={{ textAlign: "center", marginTop: 16 }}
@@ -25,42 +52,15 @@ const CardContainer = ({ item }) => {
               <Button onPress={() => console.log("delete")}>Delete</Button>
               <Button onPress={() => setShowModal(false)}>Close</Button>
             </Card.Content>
-          </Card>
+          </ModalCardContainer>
         </Modal>
       </Portal>
-      <Pressable
-        style={{ marginHorizontal: 24 }}
-        onLongPress={() => setShowModal(true)}
-      >
-        <View
-          style={{
-            flexDirection: "row",
-            justifyContent: "space-between",
-            alignItems: "center",
-          }}
-        >
-          <Text
-            style={{
-              fontSize: 16,
-              color: theme.colors.onPrimary,
-              fontWeight: "bold",
-              marginBottom: 8,
-              flex: 1,
-              flexWrap: "wrap",
-            }}
-          >
-            {item.prompt}
-          </Text>
-        </View>
-        <Text
-          style={{
-            fontSize: 16,
-            color: theme.colors.onPrimary,
-          }}
-        >
-          {item.answer}
-        </Text>
-      </Pressable>
+      <CardPressable onLongPress={() => setShowModal(true)}>
+        <PromptContainer>
+          <PromptText>{item.prompt}</PromptText>
+        </PromptContainer>
+        <AnswerText>{item.answer}</AnswerText>
+      </CardPressable>
     </>
   );
 };
