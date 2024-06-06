@@ -7,9 +7,16 @@
       [
         "expo-font",
         {
-          "fonts": ["assets/IndieFlower-Regular.ttf"]
+          "fonts": [
+            "assets/IndieFlower-Regular.ttf"
+          ]
         }
       ]
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "841ebbce-7652-4234-8dbc-3050ba0f6241"
+      }
+    }
   }
 }

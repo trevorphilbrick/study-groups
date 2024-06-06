@@ -31,7 +31,7 @@ export default function App() {
         >
           <PaperProvider theme={theme}>
             <SafeAreaProvider>
-              <StatusBar style="auto" />
+              <StatusBar style="light" />
               <RootNavigator />
               <Toast topOffset={40} />
             </SafeAreaProvider>
